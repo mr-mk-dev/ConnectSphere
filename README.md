@@ -455,7 +455,7 @@ Contributions are welcome! Please follow these steps:
 
 <div align="center">
 
-**Built with ❤️ by [Manish](https://github.com/mr-mk-dev) , with help of Claude AI**
+**Prepared By [Manish](https://github.com/mr-mk-dev), with help of [Claude AI](https://claude.ai/)**
 
 ⭐ Star this repo if you found it helpful!
 
