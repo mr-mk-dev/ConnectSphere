@@ -2,19 +2,50 @@ spring:
   application:
     name: Connect Sphere
 
+  profiles:
+    active: local   # Overridden in production by SPRING_PROFILES_ACTIVE env var
+
   datasource:
-    url: jdbc:postgresql://localhost:5432/connectsphere
-    username: postgres
-    password: Manish7200
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      timeout: 2000ms
 
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
-
     properties:
       hibernate:
         format_sql: true
-
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+# ─── Spring Mail (Gmail SMTP) ─────────────────────────────────────────────────
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION}
+
+# ─── App base URL (used inside verification email link) ───────────────────────
+
+app:
+  base-url: ${APP_BASE_URL}

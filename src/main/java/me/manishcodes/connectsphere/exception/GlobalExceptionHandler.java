@@ -1,5 +1,6 @@
 package me.manishcodes.connectsphere.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import me.manishcodes.connectsphere.dto.response.ApiResponse;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.List;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -88,6 +90,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>> handleGeneral(Exception ex) {
+        log.error("Unhandled exception caught: ", ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse.error(500, "Internal Server Error", "Something went wrong. Please try again later."));
     }

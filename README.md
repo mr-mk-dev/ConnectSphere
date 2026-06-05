@@ -187,8 +187,8 @@ Apache Kafka
 ### 1️⃣ Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/connectsphere-backend.git
-cd connectsphere-backend
+git clone https://github.com/mr-mk-dev/ConnectSphere.git
+cd ConnectSphere
 ```
 
 ### 2️⃣ Start Infrastructure (Docker)
@@ -459,7 +459,7 @@ Contributions are welcome! Please follow these steps:
 
 ⭐ Star this repo if you found it helpful!
 
-[![GitHub Stars](https://img.shields.io/github/stars/yourusername/connectsphere?style=social)](https://github.com/yourusername/connectsphere)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat-square&logo=linkedin)](https://linkedin.com/in/yourprofile)
+[![GitHub Stars](https://img.shields.io/github/stars/mr-mk-dev/ConnectSphere)](https://github.com/mr-mk-dev/ConnectSphere)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat-square&logo=linkedin)](https://linkedin.com/in/manish825316)
 
 </div>
