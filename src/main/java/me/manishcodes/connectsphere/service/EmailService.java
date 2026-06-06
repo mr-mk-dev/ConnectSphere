@@ -59,4 +59,72 @@ public class EmailService {
             log.error("Failed to send verification email to {}: {}", toEmail, e.getMessage());
         }
     }
+
+    @Async
+    public void sendPasswordResetEmail(String toEmail, String username, String token) {
+        String resetLink = baseUrl + "/api/v1/auth/reset-password?token=" + token;
+
+        String htmlBody = """
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
+                <h2 style="color: #4F46E5;">Password Reset Request</h2>
+                <p>Hi %s, we received a request to reset your ConnectSphere password.</p>
+                <p>Click the button below to reset your password. This link expires in <strong>15 minutes</strong>.</p>
+                <a href="%s"
+                   style="display:inline-block; padding:12px 24px; background:#4F46E5;
+                          color:#fff; text-decoration:none; border-radius:6px; font-weight:bold;">
+                    Reset My Password
+                </a>
+                <p style="margin-top:20px; color:#888; font-size:12px;">
+                    If you did not request a password reset, you can safely ignore this email.
+                    Your password will not be changed.
+                </p>
+            </div>
+            """.formatted(username, resetLink);
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject("Reset your ConnectSphere password");
+            helper.setText(htmlBody, true);
+
+            mailSender.send(message);
+            log.info("Password reset email sent to {}", toEmail);
+
+        } catch (MessagingException e) {
+            log.error("Failed to send password reset email to {}: {}", toEmail, e.getMessage());
+        }
+    }
+
+    @Async
+    public void sendPasswordResetConfirmationEmail(String toEmail, String username) {
+        String htmlBody = """
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
+                <h2 style="color: #4F46E5;">Password Changed Successfully</h2>
+                <p>Hi %s, your ConnectSphere password has been reset successfully.</p>
+                <p>If you did <strong>not</strong> make this change, please contact our support
+                   immediately or reset your password again.</p>
+                <p style="margin-top:20px; color:#888; font-size:12px;">
+                    For security, this is an automated notification.
+                </p>
+            </div>
+            """.formatted(username);
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject("Your ConnectSphere password was changed");
+            helper.setText(htmlBody, true);
+            mailSender.send(message);
+            log.info("Password reset confirmation email sent to {}", toEmail);
+        } catch (MessagingException e) {
+            log.error("Failed to send confirmation email to {}: {}", toEmail, e.getMessage());
+        }
+    }
+
+
 }

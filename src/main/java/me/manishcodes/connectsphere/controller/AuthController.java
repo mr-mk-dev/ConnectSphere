@@ -2,8 +2,10 @@ package me.manishcodes.connectsphere.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import me.manishcodes.connectsphere.dto.request.ForgotPasswordRequest;
 import me.manishcodes.connectsphere.dto.request.LoginRequest;
 import me.manishcodes.connectsphere.dto.request.RegisterRequest;
+import me.manishcodes.connectsphere.dto.request.ResetPasswordRequest;
 import me.manishcodes.connectsphere.dto.response.ApiResponse;
 import me.manishcodes.connectsphere.dto.response.AuthResponse;
 import me.manishcodes.connectsphere.service.AuthService;
@@ -44,6 +46,18 @@ public class AuthController {
     @GetMapping("/verify-email")
     public ResponseEntity<ApiResponse<String>> verifyEmail(@RequestParam String token) {
         String message = authService.verifyEmail(token);
+        return ResponseEntity.ok(ApiResponse.success(message));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse<String>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        String message = authService.forgotPassword(request);
+        return ResponseEntity.ok(ApiResponse.success(message));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse<String>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        String message = authService.resetPassword(request);
         return ResponseEntity.ok(ApiResponse.success(message));
     }
 

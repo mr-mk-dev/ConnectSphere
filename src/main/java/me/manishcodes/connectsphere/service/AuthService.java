@@ -2,9 +2,7 @@ package me.manishcodes.connectsphere.service;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import me.manishcodes.connectsphere.dto.request.LoginRequest;
-import me.manishcodes.connectsphere.dto.request.RefreshTokenRequest;
-import me.manishcodes.connectsphere.dto.request.RegisterRequest;
+import me.manishcodes.connectsphere.dto.request.*;
 import me.manishcodes.connectsphere.dto.response.AuthResponse;
 import me.manishcodes.connectsphere.entity.User;
 import me.manishcodes.connectsphere.enums.AuthProvider;
@@ -14,6 +12,7 @@ import me.manishcodes.connectsphere.exception.ResourceNotFoundException;
 import me.manishcodes.connectsphere.exception.UnauthorizedException;
 import me.manishcodes.connectsphere.repository.UserRepository;
 import me.manishcodes.connectsphere.security.JwtTokenProvider;
+import org.apache.coyote.BadRequestException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -69,7 +68,7 @@ public class AuthService {
         return "Registration successful! Please check your email to verify your account.";
     }
 
-    /**
+    /*
      * Called when user clicks the verification link in their email.
      * Looks up the token in Redis → marks user as verified → deletes token.
      */
@@ -135,5 +134,47 @@ public class AuthService {
         return new AuthResponse(newAccessToken, refreshToken, "Token refreshed");
     }
 
+    public String forgotPassword(ForgotPasswordRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new ResourceNotFoundException("User Not found"));
+        // Generate token → store in Redis with 15 min
+        String resetToken = UUID.randomUUID().toString();
+        redisTemplate.opsForValue().set(
+                "password-reset:" + resetToken,
+                user.getId().toString(),
+                Duration.ofMinutes(15)
+        );
+
+        emailService.sendPasswordResetEmail(
+                user.getEmail(),
+                user.getUsername(),
+                resetToken
+        );
+        return "Password reset link sent to your email";
+    }
+
+    // ── RESET PASSWORD ──
+
+    public String resetPassword(ResetPasswordRequest request) {
+        // 1. Validate token from Redis
+        String userId = redisTemplate.opsForValue().get("password-reset:" + request.getToken());
+        if (userId == null) {
+            throw new UnauthorizedException("Invalid or expired reset token");
+        }
+
+        // 2. Update password
+        User user = userRepository.findById(UUID.fromString(userId))
+                .orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        // 3. Delete token from Redis so it can't be reused
+        redisTemplate.delete("password-reset:" + request.getToken());
+
+        // 4. Notify user via email ← ADD THIS
+        emailService.sendPasswordResetConfirmationEmail(user.getEmail(), user.getUsername());
+
+        return "Password reset successfully";
+    }
 
 }
