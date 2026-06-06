@@ -103,6 +103,32 @@ Real-time messaging • Event-driven feeds • Cloud-native deployment
 
 <br/>
 
+## 📊 Development Progress
+
+> Current Status: **Authentication Module Complete** — actively building core features.
+
+| Module | Status | Details |
+|--------|--------|---------|
+| 🏗️ **Project Setup** | ✅ Done | Spring Boot 3.2, Maven, Docker, Jenkinsfile |
+| 🗄️ **Entity Layer** | ✅ Done | User, Post, Comment, Like, Follow, Message, Report |
+| 📦 **Repository Layer** | ✅ Done | JPA repos for all 7 entities |
+| 🔢 **Enums** | ✅ Done | Role, AuthProvider, Passion, ReportReason, ReportStatus |
+| 🔐 **Authentication Module** | ✅ Done | Register, Login, Email Verify, Forgot/Reset Password, JWT, Refresh Token |
+| 📧 **Email Service** | ✅ Done | Verification & password reset email flows |
+| 🛡️ **Security Layer** | ✅ Done | JWT Filter, CustomUserDetails, JwtTokenProvider |
+| ⚙️ **Config** | ✅ Done | SecurityConfig, RedisConfig |
+| ⚠️ **Exception Handling** | ✅ Done | GlobalExceptionHandler + 8 custom exceptions |
+| 📋 **DTOs** | ✅ Done | ApiResponse, AuthResponse, Login/Register/Forgot/Reset/Refresh DTOs |
+| 👤 **User Module** | 🚧 Planned | Profile CRUD, Avatar upload, Follow/Unfollow, Search |
+| 📝 **Post Module** | 🚧 Planned | Create/Edit/Delete posts, News feed, Likes, Comments |
+| 💬 **Chat Module** | 🚧 Planned | WebSocket, 1:1 messaging, online presence |
+| 🛡️ **Admin Module** | 🚧 Planned | Dashboard, user management, content moderation |
+| 📨 **Kafka Integration** | 🚧 Planned | Event-driven feed fan-out, chat events |
+| ☁️ **AWS S3** | 🚧 Planned | Media uploads (avatars, post images) |
+| 🖥️ **Frontend (React)** | 🚧 Planned | Full UI with Vite + Axios |
+
+<br/>
+
 ## 🏗️ Architecture
 
 ```
@@ -318,29 +344,83 @@ http://localhost:8080/swagger-ui.html
 ## 📂 Project Structure
 
 ```
-connectsphere-backend/
+connectsphere/
 │
-├── 📁 src/main/java/com/connectsphere/
+├── 📁 src/main/java/me/manishcodes/connectsphere/
 │   ├── 🚀 ConnectSphereApplication.java
 │   │
-│   ├── 📁 config/          # Security, JWT, WebSocket, Redis, Kafka, S3, Swagger
-│   ├── 📁 controller/      # REST endpoints (Auth, User, Post, Chat, Admin)
-│   ├── 📁 service/         # Business logic layer
-│   ├── 📁 repository/      # JPA data access layer
-│   ├── 📁 entity/          # Database entities (User, Post, Comment, etc.)
-│   ├── 📁 dto/             # Request & Response DTOs
-│   │   ├── 📁 request/     # Incoming payloads
-│   │   └── 📁 response/    # Outgoing payloads + ApiResponse<T>
-│   ├── 📁 security/        # JWT filter, OAuth2 handler, UserDetails
-│   ├── 📁 websocket/       # Chat WebSocket handler & events
-│   ├── 📁 kafka/           # Producer, Consumer, Topic configs
-│   ├── 📁 exception/       # Global exception handler + custom exceptions
-│   └── 📁 util/            # Constants, helpers
+│   ├── 📁 config/                    ✅ Implemented
+│   │   ├── SecurityConfig.java
+│   │   └── RedisConfig.java
+│   │
+│   ├── 📁 controller/                ✅ Auth done | 🚧 Others planned
+│   │   ├── AuthController.java       ✅
+│   │   └── PublicController.java     ✅
+│   │
+│   ├── 📁 service/                   ✅ Auth done | 🚧 Others planned
+│   │   ├── AuthService.java          ✅
+│   │   └── EmailService.java         ✅
+│   │
+│   ├── 📁 repository/                ✅ All repos implemented
+│   │   ├── UserRepository.java
+│   │   ├── PostRepository.java
+│   │   ├── CommentRepository.java
+│   │   ├── LikeRepository.java
+│   │   ├── FollowRepository.java
+│   │   ├── MessageRepository.java
+│   │   └── ReportRepository.java
+│   │
+│   ├── 📁 entity/                    ✅ All entities implemented
+│   │   ├── User.java
+│   │   ├── Post.java
+│   │   ├── Comment.java
+│   │   ├── Like.java
+│   │   ├── Follow.java
+│   │   ├── Message.java
+│   │   └── Report.java
+│   │
+│   ├── 📁 dto/                       ✅ Auth DTOs done
+│   │   ├── 📁 request/
+│   │   │   ├── RegisterRequest.java
+│   │   │   ├── LoginRequest.java
+│   │   │   ├── ForgotPasswordRequest.java
+│   │   │   ├── ResetPasswordRequest.java
+│   │   │   └── RefreshTokenRequest.java
+│   │   └── 📁 response/
+│   │       ├── ApiResponse.java
+│   │       └── AuthResponse.java
+│   │
+│   ├── 📁 security/                  ✅ Fully implemented
+│   │   ├── JwtTokenProvider.java
+│   │   ├── JwtAuthenticationFilter.java
+│   │   ├── CustomUserDetails.java
+│   │   └── CustomUserDetailsService.java
+│   │
+│   ├── 📁 enums/                     ✅ Fully implemented
+│   │   ├── Role.java
+│   │   ├── AuthProvider.java
+│   │   ├── Passion.java
+│   │   ├── ReportReason.java
+│   │   └── ReportStatus.java
+│   │
+│   ├── 📁 exception/                 ✅ Fully implemented
+│   │   ├── GlobalExceptionHandler.java
+│   │   ├── ResourceNotFoundException.java
+│   │   ├── DuplicateResourceException.java
+│   │   ├── AccountNotVerifiedException.java
+│   │   ├── AccountBannedException.java
+│   │   ├── UnauthorizedException.java
+│   │   ├── ForbiddenException.java
+│   │   ├── RateLimitExceededException.java
+│   │   └── FileUploadException.java
+│   │
+│   ├── 📁 websocket/                 🚧 Planned
+│   ├── 📁 kafka/                     🚧 Planned
+│   └── 📁 util/                      🚧 Planned
 │
 ├── 📁 src/main/resources/
-│   ├── application.yml
-│   ├── application-dev.yml
-│   └── application-prod.yml
+│   ├── application.yaml
+│   └── application-local.yaml
 │
 ├── 🐳 Dockerfile
 ├── 🐳 docker-compose.yml
