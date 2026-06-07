@@ -27,6 +27,8 @@ public class User {
     @Column(nullable = false, unique = true, length = 50)
     private String username;
 
+    private LocalDateTime usernameChangedAt; // null = never changed
+
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
