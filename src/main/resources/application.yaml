@@ -5,6 +5,10 @@ spring:
   profiles:
     active: local   # Overridden in production by SPRING_PROFILES_ACTIVE env var
 
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher  # fixes Swagger + Spring Boot compatibility
+
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
@@ -49,3 +53,12 @@ jwt:
 
 app:
   base-url: ${APP_BASE_URL}
+
+# ─── Swagger / OpenAPI ────────────────────────────────────────────────────────
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html       # open this URL in browser
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs

@@ -42,7 +42,17 @@ public class SecurityConfig{
                         // Public — anyone can access
                         .requestMatchers("/health/**").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+
+                        // Swagger UI + OpenAPI spec (all springdoc routes)
+                        .requestMatchers(
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/webjars/**"
+                        ).permitAll()
+
                         .requestMatchers("/ws/**").permitAll()
 
                         // Admin only

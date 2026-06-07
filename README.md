@@ -4,7 +4,7 @@
 
 ### *Where Connections Come Alive*
 
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org)
 [![Redis](https://img.shields.io/badge/Redis-7-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io)
@@ -105,22 +105,25 @@ Real-time messaging • Event-driven feeds • Cloud-native deployment
 
 ## 📊 Development Progress
 
-> Current Status: **Authentication Module Complete** — actively building core features.
+> Current Status: **Auth + User Module Complete** — actively building Post module.
 
 | Module | Status | Details |
 |--------|--------|---------|
-| 🏗️ **Project Setup** | ✅ Done | Spring Boot 3.2, Maven, Docker, Jenkinsfile |
+| 🏗️ **Project Setup** | ✅ Done | Spring Boot 4.0, Maven, Docker, Jenkinsfile |
 | 🗄️ **Entity Layer** | ✅ Done | User, Post, Comment, Like, Follow, Message, Report |
-| 📦 **Repository Layer** | ✅ Done | JPA repos for all 7 entities |
+| 📦 **Repository Layer** | ✅ Done | JPA repos for all 7 entities + custom JPQL queries |
 | 🔢 **Enums** | ✅ Done | Role, AuthProvider, Passion, ReportReason, ReportStatus |
-| 🔐 **Authentication Module** | ✅ Done | Register, Login, Email Verify, Forgot/Reset Password, JWT, Refresh Token |
+| 🔐 **Authentication Module** | ✅ Done | Register, Login, Email Verify, Forgot/Reset Password, JWT |
 | 📧 **Email Service** | ✅ Done | Verification & password reset email flows |
 | 🛡️ **Security Layer** | ✅ Done | JWT Filter, CustomUserDetails, JwtTokenProvider |
-| ⚙️ **Config** | ✅ Done | SecurityConfig, RedisConfig |
+| ⚙️ **Config** | ✅ Done | SecurityConfig, RedisConfig, SwaggerConfig, DataSeeder |
 | ⚠️ **Exception Handling** | ✅ Done | GlobalExceptionHandler + 8 custom exceptions |
-| 📋 **DTOs** | ✅ Done | ApiResponse, AuthResponse, Login/Register/Forgot/Reset/Refresh DTOs |
-| 👤 **User Module** | 🚧 Planned | Profile CRUD, Avatar upload, Follow/Unfollow, Search |
-| 📝 **Post Module** | 🚧 Planned | Create/Edit/Delete posts, News feed, Likes, Comments |
+| 📋 **DTOs** | ✅ Done | ApiResponse, AuthResponse, UserResponse, UpdateProfileRequest + Auth DTOs |
+| 👤 **User Module** | ✅ Done | Get/Update profile, Get by ID, Paginated search sorted by followers |
+| 📖 **API Documentation** | ✅ Done | Swagger UI via springdoc-openapi with JWT auth support |
+| 🌱 **Test Data Seeder** | ✅ Done | Auto-seeds 500 users + follow relationships on local startup |
+| 📝 **Post Module** | 🚧 Next | Create/Edit/Delete posts, News feed, Likes, Comments |
+| 🔗 **Follow Module** | 🚧 Next | Follow/Unfollow, followers list, following list |
 | 💬 **Chat Module** | 🚧 Planned | WebSocket, 1:1 messaging, online presence |
 | 🛡️ **Admin Module** | 🚧 Planned | Dashboard, user management, content moderation |
 | 📨 **Kafka Integration** | 🚧 Planned | Event-driven feed fan-out, chat events |
@@ -283,61 +286,59 @@ http://localhost:8080/swagger-ui.html
 
 ## 📡 API Documentation
 
-### 🔐 Authentication
-| Method | Endpoint | Description |
-|:------:|----------|-------------|
-| `POST` | `/api/v1/auth/register` | Register new user |
-| `POST` | `/api/v1/auth/login` | Login (returns JWT) |
-| `POST` | `/api/v1/auth/oauth/google` | Google OAuth login |
-| `POST` | `/api/v1/auth/oauth/github` | GitHub OAuth login |
-| `GET` | `/api/v1/auth/verify-email` | Verify email token |
-| `POST` | `/api/v1/auth/forgot-password` | Request password reset |
-| `POST` | `/api/v1/auth/reset-password` | Reset password |
-| `POST` | `/api/v1/auth/refresh-token` | Refresh JWT token |
+> 📖 Full interactive docs with request/response schemas available at `http://localhost:8080/swagger-ui.html`
 
-### 👤 Users
+### 🔐 Authentication — `/api/v1/auth` — Public (no token needed)
+| Method | Endpoint | Auth | Description |
+|:------:|----------|:----:|-------------|
+| `POST` | `/api/v1/auth/register` | 🔓 | Register new user + sends verification email |
+| `POST` | `/api/v1/auth/login` | 🔓 | Login — returns JWT token |
+| `GET` | `/api/v1/auth/verify-email?token=` | 🔓 | Activate account via email link |
+| `POST` | `/api/v1/auth/forgot-password` | 🔓 | Send password reset email |
+| `POST` | `/api/v1/auth/reset-password` | 🔓 | Reset password with token |
+
+### 👤 Users — `/api/v1/users` — 🔐 JWT Required
 | Method | Endpoint | Description |
 |:------:|----------|-------------|
 | `GET` | `/api/v1/users/me` | Get my profile |
-| `PUT` | `/api/v1/users/me` | Update my profile |
-| `POST` | `/api/v1/users/me/avatar` | Upload avatar |
-| `GET` | `/api/v1/users/{id}` | Get user profile |
-| `GET` | `/api/v1/users/search?q=` | Search users |
-| `POST` | `/api/v1/users/{id}/follow` | Follow user |
-| `DELETE` | `/api/v1/users/{id}/follow` | Unfollow user |
-| `GET` | `/api/v1/users/{id}/followers` | Get followers |
-| `GET` | `/api/v1/users/{id}/following` | Get following |
+| `PUT` | `/api/v1/users/me` | Update profile (bio, username, passion, DOB, avatar) |
+| `GET` | `/api/v1/users/{id}` | Get any user's public profile by UUID |
+| `GET` | `/api/v1/users/search?q=&page=0&size=10` | Search users by name/email — sorted by followers |
 
-### 📝 Posts
+### 📝 Posts — `/api/v1/posts` — 🚧 Coming Soon
 | Method | Endpoint | Description |
 |:------:|----------|-------------|
 | `POST` | `/api/v1/posts` | Create post |
 | `GET` | `/api/v1/posts/{id}` | Get post |
 | `PUT` | `/api/v1/posts/{id}` | Edit post |
 | `DELETE` | `/api/v1/posts/{id}` | Delete post |
-| `GET` | `/api/v1/posts/feed` | Get news feed |
+| `GET` | `/api/v1/posts/feed` | Get personalized news feed |
 | `POST` | `/api/v1/posts/{id}/like` | Toggle like |
 | `POST` | `/api/v1/posts/{id}/comments` | Add comment |
-| `GET` | `/api/v1/posts/search?q=` | Search posts |
 
-### 💬 Chat
+### 🔗 Follow — `/api/v1/users` — 🚧 Coming Soon
 | Method | Endpoint | Description |
 |:------:|----------|-------------|
-| `WS` | `/ws/chat` | WebSocket connection |
-| `GET` | `/api/v1/chat/conversations` | Get conversations |
+| `POST` | `/api/v1/users/{id}/follow` | Follow a user |
+| `DELETE` | `/api/v1/users/{id}/follow` | Unfollow a user |
+| `GET` | `/api/v1/users/{id}/followers` | Get user's followers |
+| `GET` | `/api/v1/users/{id}/following` | Get user's following list |
+
+### 💬 Chat — `/api/v1/chat` — 🚧 Coming Soon
+| Method | Endpoint | Description |
+|:------:|----------|-------------|
+| `WS` | `/ws/chat` | WebSocket connection (STOMP) |
+| `GET` | `/api/v1/chat/conversations` | Get all conversations |
 | `GET` | `/api/v1/chat/{userId}/messages` | Get message history |
 
-### 🛡️ Admin
+### 🛡️ Admin — `/api/v1/admin` — 🚧 Coming Soon
 | Method | Endpoint | Description |
 |:------:|----------|-------------|
-| `GET` | `/api/v1/admin/dashboard` | Dashboard stats |
+| `GET` | `/api/v1/admin/dashboard` | Platform analytics |
 | `GET` | `/api/v1/admin/users` | List all users |
 | `PUT` | `/api/v1/admin/users/{id}/ban` | Ban/Unban user |
 | `DELETE` | `/api/v1/admin/users/{id}` | Delete user |
-| `GET` | `/api/v1/admin/reports` | View reports |
-| `GET` | `/api/v1/admin/analytics/growth` | Growth analytics |
-
-> 📖 Full interactive docs available at `/swagger-ui.html` when running locally.
+| `GET` | `/api/v1/admin/reports` | View content reports |
 
 <br/>
 
@@ -350,27 +351,31 @@ connectsphere/
 │   ├── 🚀 ConnectSphereApplication.java
 │   │
 │   ├── 📁 config/                    ✅ Implemented
-│   │   ├── SecurityConfig.java
-│   │   └── RedisConfig.java
+│   │   ├── SecurityConfig.java       ✅ JWT + route rules
+│   │   ├── RedisConfig.java          ✅ Redis template
+│   │   ├── SwaggerConfig.java        ✅ OpenAPI + JWT auth button
+│   │   └── DataSeeder.java           ✅ Auto-seeds 500 users on local startup
 │   │
-│   ├── 📁 controller/                ✅ Auth done | 🚧 Others planned
-│   │   ├── AuthController.java       ✅
+│   ├── 📁 controller/
+│   │   ├── AuthController.java       ✅ 5 endpoints
+│   │   ├── UserController.java       ✅ 4 endpoints
 │   │   └── PublicController.java     ✅
 │   │
-│   ├── 📁 service/                   ✅ Auth done | 🚧 Others planned
+│   ├── 📁 service/
 │   │   ├── AuthService.java          ✅
+│   │   ├── UserService.java          ✅ Profile CRUD + paginated search
 │   │   └── EmailService.java         ✅
 │   │
-│   ├── 📁 repository/                ✅ All repos implemented
-│   │   ├── UserRepository.java
-│   │   ├── PostRepository.java
-│   │   ├── CommentRepository.java
-│   │   ├── LikeRepository.java
-│   │   ├── FollowRepository.java
-│   │   ├── MessageRepository.java
-│   │   └── ReportRepository.java
+│   ├── 📁 repository/
+│   │   ├── UserRepository.java       ✅ + JPQL search sorted by followers
+│   │   ├── PostRepository.java       ✅
+│   │   ├── CommentRepository.java    ✅
+│   │   ├── LikeRepository.java       ✅
+│   │   ├── FollowRepository.java     ✅
+│   │   ├── MessageRepository.java    ✅
+│   │   └── ReportRepository.java     ✅
 │   │
-│   ├── 📁 entity/                    ✅ All entities implemented
+│   ├── 📁 entity/                    ✅ All 7 entities
 │   │   ├── User.java
 │   │   ├── Post.java
 │   │   ├── Comment.java
@@ -379,16 +384,17 @@ connectsphere/
 │   │   ├── Message.java
 │   │   └── Report.java
 │   │
-│   ├── 📁 dto/                       ✅ Auth DTOs done
+│   ├── 📁 dto/
 │   │   ├── 📁 request/
-│   │   │   ├── RegisterRequest.java
-│   │   │   ├── LoginRequest.java
-│   │   │   ├── ForgotPasswordRequest.java
-│   │   │   ├── ResetPasswordRequest.java
-│   │   │   └── RefreshTokenRequest.java
+│   │   │   ├── RegisterRequest.java  ✅
+│   │   │   ├── LoginRequest.java     ✅
+│   │   │   ├── UpdateProfileRequest.java ✅
+│   │   │   ├── ForgotPasswordRequest.java ✅
+│   │   │   └── ResetPasswordRequest.java  ✅
 │   │   └── 📁 response/
-│   │       ├── ApiResponse.java
-│   │       └── AuthResponse.java
+│   │       ├── ApiResponse.java      ✅
+│   │       ├── AuthResponse.java     ✅
+│   │       └── UserResponse.java     ✅
 │   │
 │   ├── 📁 security/                  ✅ Fully implemented
 │   │   ├── JwtTokenProvider.java
@@ -399,7 +405,7 @@ connectsphere/
 │   ├── 📁 enums/                     ✅ Fully implemented
 │   │   ├── Role.java
 │   │   ├── AuthProvider.java
-│   │   ├── Passion.java
+│   │   ├── Passion.java              ✅ 30 passion categories
 │   │   ├── ReportReason.java
 │   │   └── ReportStatus.java
 │   │
@@ -411,7 +417,6 @@ connectsphere/
 │   │   ├── AccountBannedException.java
 │   │   ├── UnauthorizedException.java
 │   │   ├── ForbiddenException.java
-│   │   ├── RateLimitExceededException.java
 │   │   └── FileUploadException.java
 │   │
 │   ├── 📁 websocket/                 🚧 Planned
@@ -420,7 +425,7 @@ connectsphere/
 │
 ├── 📁 src/main/resources/
 │   ├── application.yaml
-│   └── application-local.yaml
+│   └── seed_users.sql                (manual alternative to DataSeeder)
 │
 ├── 🐳 Dockerfile
 ├── 🐳 docker-compose.yml
