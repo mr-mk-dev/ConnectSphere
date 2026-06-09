@@ -1,10 +1,29 @@
 package me.manishcodes.connectsphere.repository;
 
 import me.manishcodes.connectsphere.entity.Follow;
+import me.manishcodes.connectsphere.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface FollowRepository extends JpaRepository<Follow, UUID> {
 
+    boolean existsByFollowerIdAndFollowingId(UUID followerId, UUID followingId);
+
+    Optional<Follow> findByFollowerIdAndFollowingId(UUID followerId, UUID followingId);
+
+    @Query("SELECT f.follower FROM Follow f WHERE f.following.id = :userId")
+    Page<User> findFollowersByUserId(@Param("userId") UUID userId, Pageable pageable);
+
+    @Query("SELECT f.following FROM Follow f WHERE f.follower.id = :userId")
+    Page<User> findFollowingByUserId(@Param("userId") UUID userId, Pageable pageable);
+
+    long countByFollowingId(UUID userId);
+
+    long countByFollowerId(UUID userId);
 }

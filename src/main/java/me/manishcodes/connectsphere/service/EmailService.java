@@ -29,7 +29,7 @@ public class EmailService {
 
         String htmlBody = """
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
-                    <h2 style="color: #4F46E5;">Welcome to ConnectSphere, %s! </h2>
+                    <h2 style="color: #23a0faff;">Welcome to ConnectSphere, %s! </h2>
                     <p>Thank you for registering. Please verify your email address by clicking the button below.</p>
                     <p>This link expires in <strong>24 hours</strong>.</p>
                     <a href="%s"

@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 @Tag(name = "Authentication", description = "Register, login, email verification and password reset")
-@SecurityRequirements   // all auth endpoints are public — no JWT needed
+@SecurityRequirements
 public class AuthController {
 
     private final AuthService authService;
@@ -28,8 +28,7 @@ public class AuthController {
     @Operation(summary = "Register a new user", description = "Creates a new account and sends a verification email")
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<String>> register(
-            @Valid @RequestBody RegisterRequest request)
-    {
+            @Valid @RequestBody RegisterRequest request) {
         String response = authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.created("Registration Completed", response));
@@ -38,18 +37,11 @@ public class AuthController {
     @Operation(summary = "Login", description = "Returns a JWT access token on success")
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthResponse>> login(
-            @Valid @RequestBody LoginRequest request)
-    {
+            @Valid @RequestBody LoginRequest request) {
         AuthResponse response = authService.login(request);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
-    /**
-     * GET /api/v1/auth/verify-email?token=<uuid>
-     * This is the link the user clicks in their inbox.
-     * Spring hits this endpoint, AuthService validates the token in Redis,
-     * marks the user verified in DB, and deletes the token so it can't be reused.
-     */
     @Operation(summary = "Verify email", description = "Click link from the verification email — validates the token and activates the account")
     @GetMapping("/verify-email")
     public ResponseEntity<ApiResponse<String>> verifyEmail(@RequestParam String token) {
